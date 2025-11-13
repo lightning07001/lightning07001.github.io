@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TESA Object Detection</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Prompt", sans-serif; /* ใช้ฟอนต์ Prompt */
+            background: linear-gradient(135deg, #700000, #ffcc00);
+            color: #fff;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo img {
+            height: 60px;
+            transition: transform 0.4s ease;
+        }
+
+        .logo img:hover {
+            transform: scale(1.15);
+        }
+
+        .top-bar {
+            margin-top: 50px; /* เพิ่มระยะห่างด้านบน */
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+        }
+
+        /* 💡 แก้ไข: ปรับขนาด h1 ให้ใหญ่ขึ้นและใช้ความหนา (Weight) ที่ชัดเจน */
+        .top-bar h1 {
+            font-size: 3.5rem; /* เดิม 2.5rem */
+            font-weight: 700; /* ทำให้หนาขึ้น */
+            color: #ffeb3b;
+            letter-spacing: 3px; /* เพิ่มระยะห่างตัวอักษร */
+        }
+
+        /* 💡 แก้ไข: ปรับขนาดและน้ำหนักของคำอธิบาย */
+        .top-bar p {
+            font-size: 1.3rem; /* เดิม 1.1rem */
+            font-weight: 300; /* ทำให้ดูเบาลง ตัดกับ H1 */
+            color: #fff;
+            opacity: 0.95;
+            margin-top: 15px;
+        }
+
+        .card-bar {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin: 80px auto; /* เพิ่มระยะห่างด้านบน/ล่าง */
+            width: 90%;
+            max-width: 1100px; /* ขยายความกว้างสูงสุด */
+        }
+
+        .bar {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 25px; /* ทำให้มุมมนขึ้นเล็กน้อย */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            overflow: hidden;
+            width: 300px; /* เพิ่มความกว้างของการ์ด */
+            cursor: pointer;
+            position: relative;
+        }
+
+        .bar::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .bar:hover::before {
+            left: 100%;
+        }
+
+        .bar:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(255, 230, 0, 0.5); /* เพิ่มความเข้มเงา */
+            border-color: #ffeb3b;
+        }
+
+        .bar a {
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px; /* เพิ่ม Padding ในการ์ด */
+        }
+
+        .bar img {
+            width: 120px; /* เพิ่มขนาดรูปภาพใน Card */
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.6)); /* ทำให้เงาดูสว่างขึ้น */
+            transition: transform 0.3s ease;
+        }
+
+        .bar:hover img {
+            transform: scale(1.1);
+        }
+
+        /* 💡 แก้ไข: ปรับขนาดหัวข้อการ์ดให้ใหญ่และหนาขึ้น */
+        .bar h4 {
+            color: #ffeb3b;
+            margin: 10px 0 5px 0;
+            font-size: 1.6rem; /* เดิม 1.3rem */
+            font-weight: 600; /* ทำให้หนาขึ้น */
+        }
+
+        /* 💡 แก้ไข: ปรับขนาดคำอธิบายการ์ดให้ชัดเจนขึ้น */
+        .bar p {
+            font-size: 1.1rem; /* เดิม 0.95rem */
+            opacity: 0.9;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo">
+        <img src="elec-removebg-preview.png" alt="">
+        <img src="naval.png" alt="">
+        <img src="crma.png" alt="">
+        <img src="air-removebg-preview.png" alt="">
+        <img src="police-removebg-preview.png" alt="">
+    </div>
+
+    <div class="top-bar">
+        <h1>TESA Object Detection</h1>
+        <p>ระบบตรวจจับและติดตามวัตถุ<br>Object Detection and Tracking System</p>
+    </div>
+
+    <div class="card-bar">
+        <div class="bar">
+            <a href="dashborad.html">
+                <img src="OIP__2_-removebg-preview.png" alt="">
+                <h4>Dashboard</h4>
+                <p>ดูข้อมูลการตรวจจับวัตถุแบบเรียลไทม์</p>
+            </a>
+        </div>
+
+        <div class="bar">
+            <a href="battle.html">
+                <img src="https://cdn-icons-png.freepik.com/512/1732/1732452.png" alt="">
+                <h4>Battle Field</h4>
+                <p>ติดตามสถานการณ์สนามรบแบบเรียลไทม์</p>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

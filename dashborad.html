@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard จปร.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle at top, #7c0000, #1e0000);
+            margin: 0;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            transition: 0.3s ease;
+            width: 350px; /* จำกัดความกว้าง Card */
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+        }
+
+        h2 {
+            color: gold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+            margin-bottom: 30px; /* เพิ่มระยะห่างด้านล่าง */
+            font-weight: 600;
+        }
+
+        .input-group {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        input {
+            width: 100%; /* ปรับให้เต็มความกว้าง Card */
+            box-sizing: border-box; /* สำคัญสำหรับการกำหนด width 100% */
+            padding: 12px 15px;
+            border: 1px solid gold;
+            border-radius: 8px;
+            outline: none;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.85);
+            color: #550000;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            box-shadow: 0 0 10px gold;
+            transform: scale(1.02); /* ปรับให้ขยายน้อยลง */
+        }
+        
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* ระยะห่างระหว่างปุ่ม */
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 💡 ปุ่มเชื่อมต่อหลัก */
+        #submitBtn {
+            background: linear-gradient(90deg, #b30000, #ffcc00);
+            color: white;
+            box-shadow: 0 4px 15px rgba(179, 0, 0, 0.5);
+        }
+
+        #submitBtn::after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        #submitBtn:hover::after {
+            width: 100%;
+        }
+
+        #submitBtn:active {
+            transform: scale(0.96);
+        }
+
+        /* 💡 ปุ่มย้อนกลับ */
+        #backBtn {
+            background: rgba(255, 255, 255, 0.1);
+            color: gold;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+        }
+
+        #backBtn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 10px;
+            color: gold;
+            font-size: 12px;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>แดชบอร์ดการเชื่อมต่อ</h2>
+        <div class="input-group">
+            <input type="text" placeholder="Camera ID" id="cameraId" value="d3c6cbed-928a-456b-bd9b-9632192d2745">
+        </div>
+        <div class="input-group">
+            <input type="password" placeholder="Token" id="token" value="b4190b07-3af4-4b49-a5bc-af7f824a17b3"> </div>
+        
+        <div class="button-group">
+            <button id="submitBtn">เชื่อมต่อระบบ</button>
+            <button id="backBtn">ย้อนกลับไปหน้าเเรก</button>
+        </div>
+    </div>
+
+   
+    <script>
+        // 💡 1. กำหนด API/IP Endpoint
+        // *** ผู้จัดงานจะให้ค่านี้มาภายหลัง: ให้เปลี่ยน 'YOUR_API_ENDPOINT_HERE' เป็น URL จริง ***
+        const API_ENDPOINT = 'YOUR_API_ENDPOINT_HERE'; 
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const backBtn = document.getElementById('backBtn');
+        const cameraIdInput = document.getElementById('cameraId');
+        const tokenInput = document.getElementById('token');
+
+        // 💡 2. ฟังก์ชันจัดการการเชื่อมต่อ API/IP
+        async function handleConnection() {
+            const cameraId = cameraIdInput.value.trim();
+            const token = tokenInput.value.trim();
+
+            if (!cameraId || !token) {
+                alert('กรุณากรอก Camera ID และ Token ให้ครบถ้วน');
+                return;
+            }
+
+            // UI Feedback: เริ่มเชื่อมต่อ
+            submitBtn.innerText = '🔗 กำลังเชื่อมต่อ...';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.8';
+
+            try {
+                // *** ส่วนนี้คือโค้ดสำหรับเรียก API จริง ***
+                // ตัวอย่าง: การใช้ Fetch API ในการส่งข้อมูล (โดยทั่วไปจะใช้ POST)
+                const response = await fetch(API_ENDPOINT + '/connect', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // การส่ง Token ใน Header
+                    },
+                    body: JSON.stringify({ camera_id: cameraId })
+                });
+
+                if (response.ok) {
+                    // เชื่อมต่อสำเร็จ
+                    submitBtn.innerText = '✅ เชื่อมต่อสำเร็จ';
+                    submitBtn.style.background = 'linear-gradient(90deg, #38761d, #6aa84f)'; // สีเขียว
+                    submitBtn.style.boxShadow = '0 0 15px #6aa84f';
+                    
+                    // 💡 ตัวอย่าง: ถ้าเชื่อมต่อสำเร็จ อาจจะทำการเปลี่ยนหน้าไปหน้า Dashboard หลัก
+                    // setTimeout(() => {
+                    //     window.location.href = 'dashboard_main.html';
+                    // }, 1000);
+
+                } else {
+                    // เชื่อมต่อไม่สำเร็จ (API ตอบกลับด้วย Error)
+                    const errorData = await response.json();
+                    submitBtn.innerText = '❌ เชื่อมต่อล้มเหลว';
+                    submitBtn.style.background = 'linear-gradient(90deg, #cc0000, #ff6600)'; // สีแดง
+                    submitBtn.style.boxShadow = '0 0 15px #cc0000';
+                    alert(`การเชื่อมต่อล้มเหลว: ${errorData.message || 'Server Error'}`);
+                }
+
+            } catch (error) {
+                // เชื่อมต่อล้มเหลว (เช่น Network Error)
+                console.error('Connection Error:', error);
+                submitBtn.innerText = '❌ เกิดข้อผิดพลาดเครือข่าย';
+                submitBtn.style.background = 'linear-gradient(90deg, #cc0000, #ff6600)';
+                submitBtn.style.boxShadow = '0 0 15px #cc0000';
+                alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+            }
+            
+            // รีเซ็ตปุ่มหลังผ่านไป 3 วินาที (หากไม่มีการเปลี่ยนหน้า)
+            setTimeout(() => {
+                submitBtn.innerText = 'เชื่อมต่อระบบ';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.background = 'linear-gradient(90deg, #b30000, #ffcc00)';
+                submitBtn.style.boxShadow = 'none';
+            }, 3000);
+        }
+
+        // Event Listener สำหรับปุ่มเชื่อมต่อ
+        submitBtn.addEventListener('click', handleConnection);
+
+        // Event Listener สำหรับปุ่มย้อนกลับ
+        backBtn.addEventListener('click', () => {
+            // 💡 นำผู้ใช้กลับไปที่ map.html
+            window.location.href = 'map.html'; 
+        });
+    </script>
+
+</body>
+</html>

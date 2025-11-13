@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Battle Field - จปร.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700;800&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --bg1: #7c0000;
+            --bg2: #1e0000;
+            --gold: #ffd54a;
+            --deep-red: #b30000;
+            --accent: linear-gradient(90deg, #b30000, #ffcc00);
+            --card-border: rgba(255,215,0,0.35);
+            --input-bg: rgba(255,255,255,0.95);
+            --input-color: #550000;
+            --soft-shadow: 0 8px 30px rgba(0,0,0,0.45);
+        }
+
+        * { box-sizing: border-box; }
+        body{
+            margin:0;
+            font-family: "Prompt", "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            background: radial-gradient(circle at 20% 10%, var(--bg1), var(--bg2));
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        header{
+            width:100%;
+            max-width:1100px;
+            padding: 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap: 12px;
+            color: var(--gold);
+            text-shadow: 0 0 8px rgba(255,215,0,0.45);
+        }
+        header h1 { font-size: 26px; font-weight: 800; }
+        header div { font-size: 14px; }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .header-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: rgba(255,215,0,0.1);
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s, border-color 0.2s;
+        }
+        .header-btn:hover {
+            background: rgba(255,215,0,0.2);
+            border-color: var(--gold);
+            transform: translateY(-1px);
+        }
+
+
+        main.container{
+            width:100%;
+            max-width:1100px;
+            padding: 24px;
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.12));
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--soft-shadow);
+            transition: transform .25s ease, box-shadow .25s ease;
+            min-height: 320px;
+        }
+        .panel:hover { transform: translateY(-6px); box-shadow: 0 14px 40px rgba(0,0,0,0.6); }
+
+        .badge {
+            padding:6px 12px;
+            border-radius: 999px;
+            font-weight:700;
+            font-size:14px;
+            letter-spacing: .6px;
+        }
+        .badge.off { background: linear-gradient(90deg,#ffb347,#ffcc00); color:#6b1f00; }
+        .badge.def { background: linear-gradient(90deg,#ffd1d1,#ff8c8c); color:#4a0000; }
+
+        .panel h2 { margin:0; font-size:20px; font-weight: 700; color:var(--gold); text-shadow:0 0 8px rgba(255,215,0,0.22); }
+        .desc { color: rgba(255,215,0,0.85); font-size:14px; margin:8px 0 16px; }
+
+        .form { display:flex; flex-direction:column; gap:12px; margin-top:6px; }
+
+        label { font-size:14px; color: #fff; font-weight:600; }
+
+        input[type="text"]{
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,215,0,0.12);
+            background: var(--input-bg);
+            color: var(--input-color);
+            font-weight:600;
+            font-size:15px;
+            transition: transform .18s ease, box-shadow .18s ease;
+            outline: none;
+        }
+        input[type="text"]::placeholder{ color: #8a2b2b; opacity:0.8; }
+        input[type="text"]:focus{ transform: scale(1.02); box-shadow: 0 0 12px rgba(255,215,0,0.22); }
+        
+        .row { display: flex; gap: 10px; }
+        .row .btn { flex-grow: 1; }
+
+        .btn {
+            padding: 12px 16px;
+            border-radius: 10px;
+            border:none;
+            cursor:pointer;
+            font-weight:700;
+            letter-spacing:.6px;
+            font-size:15px;
+            color:#fff;
+            background: var(--accent);
+            position:relative;
+            overflow:hidden;
+            transition: transform .16s ease, box-shadow .16s ease;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(255,215,0,0.2); }
+        .btn:active { transform: scale(.97); }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid rgba(255,215,0,0.18);
+            color: var(--gold);
+        }
+
+        .status { margin-top:10px; font-size:14px; color: #fff; min-height:22px; }
+        .status .ok { color:#c8ffd7; }
+        .status .pending { color:#ffe6a7; }
+
+        .footer-actions {
+            grid-column: 1 / -1;
+            display:flex;
+            justify-content:center;
+            margin-top:18px;
+        }
+
+        .start-btn {
+            padding: 16px 40px;
+            border-radius: 14px;
+            font-size:20px;
+            font-weight:800;
+            background: linear-gradient(90deg,#ffcc00,#b30000);
+            color:#2b0000;
+            border: 1px solid rgba(0,0,0,0.3);
+            cursor:pointer;
+            position:relative;
+            overflow:hidden;
+            transition: all .3s ease;
+            box-shadow: 0 0 20px rgba(179,0,0,0.4);
+            white-space: nowrap; 
+        }
+        .start-btn::after {
+            content:"";
+            position:absolute;
+            top:0; left:-100%;
+            width:100%; height:100%;
+            background: linear-gradient(120deg,rgba(255,255,255,0.3),rgba(255,255,255,0));
+            transform: skewX(-20deg);
+            transition: 0.5s;
+        }
+        .start-btn:hover::after { left:100%; }
+        .start-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 40px rgba(255,215,0,0.4);
+        }
+        .start-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 0 20px rgba(255,215,0,0.2);
+        }
+        .start-btn:disabled{
+            opacity:0.5;
+            cursor:not-allowed;
+            box-shadow:none;
+            transform:none;
+        }
+
+        @media (max-width:880px){
+            main.container{ grid-template-columns: 1fr; padding:18px; }
+            header{ padding:18px; flex-direction: column; align-items: flex-start; }
+            .header-actions { margin-top: 10px; width: 100%; justify-content: space-between; }
+            .start-btn { font-size: 18px; padding: 14px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Battle Field</h1>
+        <div class="header-actions">
+            <button class="header-btn" id="viewMapBtn">📍 ย้อนกลับไปหน้าเเรก</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="panel" id="offPanel">
+            <div class="badge off">Offensive</div>
+            <h2>ฝ่ายบุก (Offensive)</h2>
+            <div class="desc">กรอก Camera ID และ Token ของฝ่ายบุก → กด Connect</div>
+
+            <div class="form">
+                <label>Camera ID</label>
+                <input id="offCam" type="text" placeholder="เช่น CAM_OFF_01" value="d3c6cbed-928a-456b-bd9b-9632192d2745">
+                <label>Token</label>
+                <input id="offTok" type="text" placeholder="เช่น T0K3N_OFF" value="b4190b07-3af4-4b49-a5bc-af7f824a17b3">
+                <div class="row">
+                    <button class="btn" id="offConnect"><span class="shine"></span>Connect</button>
+                    <button class="btn ghost" id="offClear">Clear</button>
+                </div>
+                <div class="status" id="offStatus"><span class="pending">ยังไม่เชื่อมต่อ</span></div>
+            </div>
+        </section>
+
+        <section class="panel" id="defPanel">
+            <div class="badge def">Defensive</div>
+            <h2>ฝ่ายรับ (Defensive)</h2>
+            <div class="desc">กรอก Camera ID และ Token ของฝ่ายรับ → กด Connect</div>
+
+            <div class="form">
+                <label>Camera ID</label>
+                <input id="defCam" type="text" placeholder="เช่น CAM_DEF_01" value="c29011b1-05d6-48a8-bffc-768dc667a509">
+                <label>Token</label>
+                <input id="defTok" type="text" placeholder="เช่น T0K3N_DEF" value="69056589-bd25-40ec-ae35-4c88c03613a4">
+                <div class="row">
+                    <button class="btn" id="defConnect"><span class="shine"></span>Connect</button>
+                    <button class="btn ghost" id="defClear">Clear</button>
+                </div>
+                <div class="status" id="defStatus"><span class="pending">ยังไม่เชื่อมต่อ</span></div>
+            </div>
+        </section>
+
+        <div class="footer-actions">
+            <button class="start-btn" id="startBattle" disabled>❌ เชื่อมต่อให้ครบทั้งสองฝ่ายก่อน</button>
+        </div>
+    </main>
+
+    <script>
+        // 🚨 สิ่งสำคัญที่สุด: คุณต้องเปลี่ยน 'YOUR_API_ENDPOINT_HERE' เป็น URL/IP ของ Server จริง
+        const API_ENDPOINT = 'YOUR_API_ENDPOINT_HERE'; 
+
+        const $ = s => document.querySelector(s);
+        const offCam = $('#offCam'), offTok = $('#offTok'), offConnect = $('#offConnect'), offClear = $('#offClear'), offStatus = $('#offStatus');
+        const defCam = $('#defCam'), defTok = $('#defTok'), defConnect = $('#defConnect'), defClear = $('#defClear'), defStatus = $('#defStatus');
+        const startBtn = $('#startBattle');
+        const viewMapBtn = $('#viewMapBtn');
+
+        /**
+         * ตรวจสอบสถานะการเชื่อมต่อของทั้งสองฝ่ายและเปิด/ปิดปุ่ม Start Battle
+         */
+        function updateStartState(){
+            const okOff = !!localStorage.getItem('connected_off');
+            const okDef = !!localStorage.getItem('connected_def');
+            
+            // ปิดปุ่มถ้าเชื่อมต่อไม่ครบทั้งคู่
+            startBtn.disabled = !(okOff && okDef);
+            
+            // อัปเดตข้อความบนปุ่มตามสถานะ
+            if (okOff && okDef) {
+                startBtn.innerText = '✅ พร้อม! เริ่มการรบ (Start Battle)';
+            } else {
+                startBtn.innerText = '❌ เชื่อมต่อให้ครบทั้งสองฝ่ายก่อน';
+            }
+        }
+
+        /**
+         * ฟังก์ชันเชื่อมต่อ API จริง
+         */
+        async function connectAPI(side){
+            if (API_ENDPOINT === 'YOUR_API_ENDPOINT_HERE') {
+                alert('🚨 กรุณาใส่ API Endpoint จริงก่อนเริ่มการเชื่อมต่อ!');
+                return;
+            }
+
+            const isOff = side === 'off';
+            const cam = isOff ? offCam.value.trim() : defCam.value.trim();
+            const tok = isOff ? offTok.value.trim() : defTok.value.trim();
+            const statusEl = isOff ? offStatus : defStatus;
+            const connectBtn = isOff ? offConnect : defConnect;
+            const connectedKey = 'connected_' + side;
+            
+            if(!cam || !tok){
+                statusEl.innerHTML = '<span style="color:#ffd1d1">กรุณากรอก Camera ID และ Token ให้ครบ</span>';
+                return;
+            }
+
+            // ตั้งค่า UI เริ่มต้น
+            connectBtn.disabled = true;
+            connectBtn.innerText = '⏳ Connecting...';
+            statusEl.innerHTML = '<span class="pending">กำลังเชื่อมต่อ...</span>';
+            localStorage.removeItem(connectedKey);
+
+            try {
+                // *** การเรียก API จริง โดยใช้ Fetch API ***
+                const response = await fetch(API_ENDPOINT + '/connect', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${tok}` // ส่ง Token ใน Header
+                    },
+                    body: JSON.stringify({ camera_id: cam })
+                });
+                
+                if (response.ok) {
+                    // เชื่อมต่อสำเร็จ
+                    statusEl.innerHTML = '<span class="ok">✅ เชื่อมต่อสำเร็จ</span>';
+                    // บันทึกข้อมูลและสถานะลงใน Local Storage
+                    localStorage.setItem('camera_' + side, cam);
+                    localStorage.setItem('token_' + side, tok);
+                    localStorage.setItem(connectedKey, '1');
+                } else {
+                    // เชื่อมต่อไม่สำเร็จ (API ตอบกลับ Error)
+                    const contentType = response.headers.get('content-type');
+                    let message = 'Server Error';
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await response.json();
+                        message = errorData.message || `Status: ${response.status}`;
+                    } else {
+                        message = `Status: ${response.status} (${response.statusText})`;
+                    }
+                    
+                    statusEl.innerHTML = `<span style="color:#ffd1d1">❌ ล้มเหลว: ${message}</span>`;
+                    localStorage.removeItem(connectedKey);
+                    alert(`การเชื่อมต่อ ${isOff ? 'ฝ่ายบุก' : 'ฝ่ายรับ'} ล้มเหลว: ${message}`);
+                }
+            } catch (error) {
+                // Network Error หรือปัญหา CORS
+                console.error('Connection Error:', error);
+                statusEl.innerHTML = '<span style="color:#ffd1d1">❌ เกิดข้อผิดพลาดเครือข่าย/CORS</span>';
+                localStorage.removeItem(connectedKey);
+                alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (โปรดตรวจสอบ Network และ API Endpoint)');
+            }
+            
+            connectBtn.disabled = false;
+            connectBtn.innerHTML = '<span class="shine"></span>Connect';
+            updateStartState();
+        }
+
+        // --- Event Listeners ---
+
+        offConnect.addEventListener('click', ()=> connectAPI('off'));
+        defConnect.addEventListener('click', ()=> connectAPI('def'));
+
+        offClear.addEventListener('click', ()=>{
+            offCam.value = offTok.value = '';
+            ['camera_off','token_off','connected_off'].forEach(localStorage.removeItem.bind(localStorage));
+            offStatus.innerHTML = '<span class="pending">ยังไม่เชื่อมต่อ</span>';
+            updateStartState();
+        });
+
+        defClear.addEventListener('click', ()=>{
+            defCam.value = defTok.value = '';
+            ['camera_def','token_def','connected_def'].forEach(localStorage.removeItem.bind(localStorage));
+            defStatus.innerHTML = '<span class="pending">ยังไม่เชื่อมต่อ</span>';
+            updateStartState();
+        });
+
+        startBtn.addEventListener('click', ()=>{
+            const okOff = !!localStorage.getItem('connected_off');
+            const okDef = !!localStorage.getItem('connected_def');
+
+            if (okOff && okDef) {
+                startBtn.disabled = true;
+                startBtn.innerText = '🚀 กำลังเริ่มระบบ...';
+                
+                setTimeout(()=>{
+                    startBtn.innerText = '✅ Battle Started';
+                    alert('ระบบตรวจจับของทั้งสองฝ่ายพร้อมทำงาน! เริ่มการรบได้เลย');
+                    // 💡 Redirect ไปหน้า map.html เมื่อการเชื่อมต่อ API เสร็จสมบูรณ์
+                    // window.location.href = 'map.html'; 
+                }, 900);
+            } else {
+                alert('กรุณาเชื่อมต่อ Camera ID และ Token ของทั้งฝ่ายบุกและฝ่ายรับให้สำเร็จก่อนเริ่มการรบ');
+                startBtn.disabled = true; 
+                updateStartState();
+            }
+        });
+
+        // Event Listener สำหรับปุ่ม View Map
+        viewMapBtn.addEventListener('click', () => {
+             window.location.href = 'map.html';
+        });
+
+        // โหลดสถานะเมื่อเปิดหน้า
+        window.addEventListener('load', ()=>{
+            // ดึงค่าที่เก็บไว้มาแสดงในช่องกรอก (ถ้ามี)
+            offCam.value = localStorage.getItem('camera_off') || offCam.value;
+            offTok.value = localStorage.getItem('token_off') || offTok.value;
+            defCam.value = localStorage.getItem('camera_def') || defCam.value;
+            defTok.value = localStorage.getItem('token_def') || defTok.value;
+            
+            // แสดงสถานะการเชื่อมต่อครั้งล่าสุด
+            if(localStorage.getItem('connected_off')) offStatus.innerHTML = '<span class="ok">✅ เชื่อมต่อสำเร็จ</span>';
+            if(localStorage.getItem('connected_def')) defStatus.innerHTML = '<span class="ok">✅ เชื่อมต่อสำเร็จ</span>';
+            
+            updateStartState();
+        });
+    </script>
+</body>
+</html>
